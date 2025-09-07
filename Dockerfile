@@ -17,7 +17,7 @@ RUN chmod +x ./mvnw
 RUN ./mvnw clean package -DskipTests
 
 # ================= Runtime Stage =================
-FROM openjdk:21-jre-slim
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
