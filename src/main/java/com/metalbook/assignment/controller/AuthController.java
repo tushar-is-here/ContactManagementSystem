@@ -29,6 +29,7 @@ public class AuthController {
     @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
+        log.info("AuthController initialized");
     }
 
     @Operation(summary = "Register a new user", description = "Create a new user account")
@@ -44,10 +45,22 @@ public class AuthController {
     public ResponseEntity<ApiResponseCustom<UserInfo>> registerUser(
             @Valid @RequestBody UserRegistrationRequest request) {
 
-        UserInfo userInfo = authService.registerUser(request);
-        ApiResponseCustom<UserInfo> response = ApiResponseCustom.success("User registered successfully", userInfo);
+        log.info("Attempting to register new user with username: {}", request.username());
+        log.debug("Registration request details - username: {}, email: {}",
+                request.username(), request.email());
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        try {
+            UserInfo userInfo = authService.registerUser(request);
+            ApiResponseCustom<UserInfo> response = ApiResponseCustom.success("User registered successfully", userInfo);
+
+            log.info("User registration successful for username: {}, userId: {}",
+                    request.username(), userInfo.id());
+
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            log.error("User registration failed for username: {} - {}", request.username(), e.getMessage());
+            throw e; // Re-throw to be handled by global exception handler
+        }
     }
 
     @Operation(summary = "Authenticate user", description = "Login with username and password to get JWT token")
@@ -63,10 +76,21 @@ public class AuthController {
     public ResponseEntity<ApiResponseCustom<AuthResponse>> authenticateUser(
             @Valid @RequestBody LoginRequest request) {
 
-        AuthResponse authResponse = authService.authenticateUser(request);
-        ApiResponseCustom<AuthResponse> response = ApiResponseCustom.success("Login successful", authResponse);
+        log.info("Authentication attempt for username: {}", request.username());
 
-        return ResponseEntity.ok(response);
+        try {
+            AuthResponse authResponse = authService.authenticateUser(request);
+            ApiResponseCustom<AuthResponse> response = ApiResponseCustom.success("Login successful", authResponse);
+
+            log.info("Authentication successful for username: {}, userId: {}",
+                    request.username(), authResponse.user().id());
+            log.debug("JWT token generated with expiration: {}", authResponse.expiresIn());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.warn("Authentication failed for username: {} - {}", request.username(), e.getMessage());
+            throw e;
+        }
     }
 
     @Operation(summary = "Get current user info", description = "Get information about the currently authenticated user")
@@ -81,10 +105,19 @@ public class AuthController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        UserInfo userInfo = authService.getCurrentUserInfo(username);
-        ApiResponseCustom<UserInfo> response = ApiResponseCustom.success(userInfo);
+        log.info("Fetching current user info for username: {}", username);
 
-        return ResponseEntity.ok(response);
+        try {
+            UserInfo userInfo = authService.getCurrentUserInfo(username);
+            ApiResponseCustom<UserInfo> response = ApiResponseCustom.success(userInfo);
+
+            log.debug("Current user info retrieved successfully for userId: {}", userInfo.id());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to fetch current user info for username: {} - {}", username, e.getMessage());
+            throw e;
+        }
     }
 
     @Operation(summary = "Check username availability", description = "Check if a username is available for registration")
@@ -96,9 +129,13 @@ public class AuthController {
     public ResponseEntity<ApiResponseCustom<Boolean>> checkUsernameAvailability(
             @RequestParam String username) {
 
+        log.info("Checking username availability for: {}", username);
+
         boolean available = authService.isUsernameAvailable(username);
         String message = available ? "Username is available" : "Username is already taken";
         ApiResponseCustom<Boolean> response = ApiResponseCustom.success(message, available);
+
+        log.debug("Username availability check result for '{}': {}", username, available);
 
         return ResponseEntity.ok(response);
     }
@@ -112,9 +149,13 @@ public class AuthController {
     public ResponseEntity<ApiResponseCustom<Boolean>> checkEmailAvailability(
             @RequestParam String email) {
 
+        log.info("Checking email availability for: {}", email);
+
         boolean available = authService.isEmailAvailable(email);
         String message = available ? "Email is available" : "Email is already registered";
         ApiResponseCustom<Boolean> response = ApiResponseCustom.success(message, available);
+
+        log.debug("Email availability check result for '{}': {}", email, available);
 
         return ResponseEntity.ok(response);
     }
@@ -125,6 +166,11 @@ public class AuthController {
     })
     @PostMapping("/logout")
     public ResponseEntity<ApiResponseCustom<String>> logout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication != null ? authentication.getName() : "unknown";
+
+        log.info("Logout request from user: {}", username);
+
         // Since we're using stateless JWT tokens, logout is handled client-side
         // by removing the token from storage. This endpoint is mainly for completeness
         // and could be used for token blacklisting in production systems.
@@ -133,6 +179,8 @@ public class AuthController {
                 "Logout successful. Please remove the token from client storage.",
                 "OK"
         );
+
+        log.debug("Logout response sent to user: {}", username);
 
         return ResponseEntity.ok(response);
     }

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Contacts", description = "Contact management endpoints")
 @SecurityRequirement(name = "bearerAuth")
 @CrossOrigin(origins = "*", maxAge = 3600)
+@Slf4j
 public class ContactController {
 
     private final ContactService contactService;
@@ -31,6 +33,7 @@ public class ContactController {
     @Autowired
     public ContactController(ContactService contactService) {
         this.contactService = contactService;
+        log.info("ContactController initialized");
     }
 
     @Operation(summary = "Create a new contact", description = "Create a new contact for the authenticated user")
@@ -49,10 +52,22 @@ public class ContactController {
             @Valid @RequestBody ContactRequest request) {
 
         Long userId = getCurrentUserId();
-        ContactResponse contact = contactService.createContact(request, userId);
-        ApiResponseCustom<ContactResponse> response = ApiResponseCustom.success("Contact created successfully", contact);
+        log.info("Creating new contact for userId: {} with email: {}", userId, request.email());
+        log.debug("Contact creation details - firstName: {}, lastName: {}, phoneNumber: {}",
+                request.firstName(), request.lastName(), request.phoneNumber());
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        try {
+            ContactResponse contact = contactService.createContact(request, userId);
+            ApiResponseCustom<ContactResponse> response = ApiResponseCustom.success("Contact created successfully", contact);
+
+            log.info("Contact created successfully with id: {} for userId: {}", contact.id(), userId);
+
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            log.error("Failed to create contact for userId: {} with email: {} - {}",
+                    userId, request.email(), e.getMessage());
+            throw e;
+        }
     }
 
     @Operation(summary = "Get contact by ID", description = "Retrieve a specific contact by its ID")
@@ -69,10 +84,20 @@ public class ContactController {
             @Parameter(description = "Contact ID") @PathVariable Long id) {
 
         Long userId = getCurrentUserId();
-        ContactResponse contact = contactService.getContactById(id, userId);
-        ApiResponseCustom<ContactResponse> response = ApiResponseCustom.success(contact);
+        log.info("Fetching contact with id: {} for userId: {}", id, userId);
 
-        return ResponseEntity.ok(response);
+        try {
+            ContactResponse contact = contactService.getContactById(id, userId);
+            ApiResponseCustom<ContactResponse> response = ApiResponseCustom.success(contact);
+
+            log.debug("Contact retrieved successfully - id: {}, email: {}", contact.id(), contact.email());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to retrieve contact with id: {} for userId: {} - {}",
+                    id, userId, e.getMessage());
+            throw e;
+        }
     }
 
     @Operation(summary = "Get all contacts", description = "Retrieve all contacts for the authenticated user with pagination")
@@ -89,10 +114,21 @@ public class ContactController {
             @Parameter(description = "Sort direction (asc/desc)") @RequestParam(defaultValue = "asc") String sortDirection) {
 
         Long userId = getCurrentUserId();
-        PagedResponse<ContactResponse> contacts = contactService.getAllContacts(userId, page, size, sortBy, sortDirection);
-        ApiResponseCustom<PagedResponse<ContactResponse>> response = ApiResponseCustom.success(contacts);
+        log.info("Fetching all contacts for userId: {} - page: {}, size: {}, sortBy: {}, sortDirection: {}",
+                userId, page, size, sortBy, sortDirection);
 
-        return ResponseEntity.ok(response);
+        try {
+            PagedResponse<ContactResponse> contacts = contactService.getAllContacts(userId, page, size, sortBy, sortDirection);
+            ApiResponseCustom<PagedResponse<ContactResponse>> response = ApiResponseCustom.success(contacts);
+
+            log.info("Retrieved {} contacts (page {}/{}) for userId: {}",
+                    contacts.content().size(), contacts.page() + 1, contacts.totalPages(), userId);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to retrieve contacts for userId: {} - {}", userId, e.getMessage());
+            throw e;
+        }
     }
 
     @Operation(summary = "Update contact", description = "Update an existing contact")
@@ -114,10 +150,23 @@ public class ContactController {
             @Valid @RequestBody ContactRequest request) {
 
         Long userId = getCurrentUserId();
-        ContactResponse contact = contactService.updateContact(id, request, userId);
-        ApiResponseCustom<ContactResponse> response = ApiResponseCustom.success("Contact updated successfully", contact);
+        log.info("Updating contact with id: {} for userId: {}", id, userId);
+        log.debug("Update request details - firstName: {}, lastName: {}, email: {}, phoneNumber: {}",
+                request.firstName(), request.lastName(), request.email(), request.phoneNumber());
 
-        return ResponseEntity.ok(response);
+        try {
+            ContactResponse contact = contactService.updateContact(id, request, userId);
+            ApiResponseCustom<ContactResponse> response = ApiResponseCustom.success("Contact updated successfully", contact);
+
+            log.info("Contact updated successfully - id: {}, email: {} for userId: {}",
+                    contact.id(), contact.email(), userId);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to update contact with id: {} for userId: {} - {}",
+                    id, userId, e.getMessage());
+            throw e;
+        }
     }
 
     @Operation(summary = "Delete contact", description = "Delete a contact by ID")
@@ -133,10 +182,20 @@ public class ContactController {
             @Parameter(description = "Contact ID") @PathVariable Long id) {
 
         Long userId = getCurrentUserId();
-        contactService.deleteContact(id, userId);
-        ApiResponseCustom<String> response = ApiResponseCustom.success("Contact deleted successfully", "OK");
+        log.info("Deleting contact with id: {} for userId: {}", id, userId);
 
-        return ResponseEntity.ok(response);
+        try {
+            contactService.deleteContact(id, userId);
+            ApiResponseCustom<String> response = ApiResponseCustom.success("Contact deleted successfully", "OK");
+
+            log.info("Contact deleted successfully - id: {} for userId: {}", id, userId);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to delete contact with id: {} for userId: {} - {}",
+                    id, userId, e.getMessage());
+            throw e;
+        }
     }
 
     @Operation(summary = "Search contacts", description = "Search contacts by first name, last name, or email")
@@ -156,17 +215,29 @@ public class ContactController {
             @Parameter(description = "Sort direction (asc/desc)") @RequestParam(defaultValue = "asc") String sortDirection) {
 
         Long userId = getCurrentUserId();
+        log.info("Searching contacts for userId: {} with criteria - firstName: {}, lastName: {}, email: {}",
+                userId, firstName, lastName, email);
+        log.debug("Search pagination - page: {}, size: {}, sortBy: {}, sortDirection: {}",
+                page, size, sortBy, sortDirection);
 
         ContactSearchParams searchParams = new ContactSearchParams(
                 firstName, lastName, email, page, size, sortBy, sortDirection
         );
 
-        PagedResponse<ContactResponse> contacts = contactService.searchContacts(searchParams, userId);
+        try {
+            PagedResponse<ContactResponse> contacts = contactService.searchContacts(searchParams, userId);
 
-        String searchMessage = buildSearchMessage(firstName, lastName, email);
-        ApiResponseCustom<PagedResponse<ContactResponse>> response = ApiResponseCustom.success(searchMessage, contacts);
+            String searchMessage = buildSearchMessage(firstName, lastName, email);
+            ApiResponseCustom<PagedResponse<ContactResponse>> response = ApiResponseCustom.success(searchMessage, contacts);
 
-        return ResponseEntity.ok(response);
+            log.info("Contact search completed for userId: {} - found {} results (page {}/{})",
+                    userId, contacts.content().size(), contacts.page() + 1, contacts.totalPages());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Contact search failed for userId: {} - {}", userId, e.getMessage());
+            throw e;
+        }
     }
 
     @Operation(summary = "Get contact statistics", description = "Get statistics about user's contacts")
@@ -179,10 +250,20 @@ public class ContactController {
     public ResponseEntity<ApiResponseCustom<ContactService.ContactStats>> getContactStats() {
 
         Long userId = getCurrentUserId();
-        ContactService.ContactStats stats = contactService.getContactStats(userId);
-        ApiResponseCustom<ContactService.ContactStats> response = ApiResponseCustom.success(stats);
+        log.info("Fetching contact statistics for userId: {}", userId);
 
-        return ResponseEntity.ok(response);
+        try {
+            ContactService.ContactStats stats = contactService.getContactStats(userId);
+            ApiResponseCustom<ContactService.ContactStats> response = ApiResponseCustom.success(stats);
+
+            log.info("Contact statistics retrieved for userId: {} - total contacts: {}",
+                    userId, stats.totalContacts());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to fetch contact statistics for userId: {} - {}", userId, e.getMessage());
+            throw e;
+        }
     }
 
     @Operation(summary = "Delete all contacts", description = "Delete all contacts for the authenticated user")
@@ -195,10 +276,19 @@ public class ContactController {
     public ResponseEntity<ApiResponseCustom<String>> deleteAllContacts() {
 
         Long userId = getCurrentUserId();
-        contactService.deleteAllContacts(userId);
-        ApiResponseCustom<String> response = ApiResponseCustom.success("All contacts deleted successfully", "OK");
+        log.warn("Deleting ALL contacts for userId: {} - This is a destructive operation!", userId);
 
-        return ResponseEntity.ok(response);
+        try {
+            contactService.deleteAllContacts(userId);
+            ApiResponseCustom<String> response = ApiResponseCustom.success("All contacts deleted successfully", "OK");
+
+            log.warn("All contacts deleted successfully for userId: {}", userId);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to delete all contacts for userId: {} - {}", userId, e.getMessage());
+            throw e;
+        }
     }
 
     // Helper methods
