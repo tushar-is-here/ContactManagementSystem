@@ -1,0 +1,94 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  error:
+    include-message: always
+    include-stacktrace: never
+
+spring:
+  application:
+    name: contact-management-system
+
+  # Database Configuration
+  datasource:
+    # PostgreSQL (for development)
+    url: jdbc:postgresql://localhost:5432/metalbook
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres@123
+
+  # JPA/Hibernate Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update # use 'update' or 'validate' in production
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+    open-in-view: false
+
+  # Jackson Configuration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+    time-zone: UTC
+
+  # Security Configuration
+  security:
+    user:
+      name: admin
+      password: admin
+      roles: ADMIN
+
+# Application Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:mySecretKey1234567890123456789012345678901234567890}
+    expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
+
+  api:
+    title: "Contact Management System API"
+    description: "REST API for managing contacts with user authentication"
+    version: "1.0.0"
+    contact:
+      name: "Development Team"
+      email: "dev@contactmanagement.com"
+      url: "https://github.com/your-org/contact-management-api"
+
+# Logging Configuration
+logging:
+  level:
+    com.example.contactmanagement: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# Springdoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    try-it-out-enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
