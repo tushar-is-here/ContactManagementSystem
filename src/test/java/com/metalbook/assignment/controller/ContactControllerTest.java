@@ -58,7 +58,11 @@ class ContactControllerTest {
                 LocalDateTime.now()
         );
 
-        mockUser = new User("testuser", "password", "test@example.com");
+//        mockUser = new User("testuser", "password", "test@example.com");
+        mockUser = User.builder()
+                .username("testuser")
+                .password("password")
+                .email("test@example.com").build();
         mockUser.setId(1L);
     }
 
