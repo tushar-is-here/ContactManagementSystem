@@ -41,13 +41,19 @@ class ContactServiceTest {
                 "+1234567890"
         );
 
-        contact = new Contact(
-                "Tushar",
-                "Panchal",
-                "tpanchal484@gmail.com",
-                "+1234567890",
-                userId
-        );
+//        contact = new Contact(
+//                "Tushar",
+//                "Panchal",
+//                "tpanchal484@gmail.com",
+//                "+1234567890",
+//                userId
+//        );
+
+        contact = Contact.builder()
+                .firstName("Tushar")
+                .lastName("Panchal")
+                .email("tpanchal484@gmail.com")
+                        .build();
         contact.setId(1L);
     }
 
@@ -95,7 +101,7 @@ class ContactServiceTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(1L);
-        assertThat(result.firstName()).isEqualTo("John");
+        assertThat(result.firstName()).isEqualTo("Tushar");
     }
 
     @Test

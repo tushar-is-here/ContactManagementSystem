@@ -64,7 +64,7 @@ class AssignmentApplicationTests {
 
 		// 3. Create a contact using the JWT token
 		ContactRequest contactRequest = new ContactRequest(
-				"John", "Doe", "john.doe@example.com", "+1234567890"
+				"Tushar", "Panchal", "tpanchal484@gmail.com", "+1234567890"
 		);
 
 		mockMvc.perform(post("/api/v1/contacts")
@@ -73,8 +73,8 @@ class AssignmentApplicationTests {
 						.content(objectMapper.writeValueAsString(contactRequest)))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.success").value(true))
-				.andExpect(jsonPath("$.data.firstName").value("John"))
-				.andExpect(jsonPath("$.data.email").value("john.doe@example.com"));
+				.andExpect(jsonPath("$.data.firstName").value("Tushar"))
+				.andExpect(jsonPath("$.data.email").value("tpanchal484@gmail.com"));
 
 		// 4. Get all contacts
 		mockMvc.perform(get("/api/v1/contacts")
@@ -82,7 +82,7 @@ class AssignmentApplicationTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.success").value(true))
 				.andExpect(jsonPath("$.data.content").isArray())
-				.andExpect(jsonPath("$.data.content[0].firstName").value("John"));
+				.andExpect(jsonPath("$.data.content[0].firstName").value("Tushar"));
 	}
 
 	private String extractTokenFromResponse(String responseBody) {

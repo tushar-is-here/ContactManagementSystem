@@ -9,26 +9,8 @@ server:
 spring:
   application:
     name: contact-management-system
-
-  # Database Configuration
-  datasource:
-    # PostgreSQL (for development)
-    url: jdbc:postgresql://localhost:5432/metalbook
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres@123
-
-  # JPA/Hibernate Configuration
-  jpa:
-    hibernate:
-      ddl-auto: update # use 'update' or 'validate' in production
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-        use_sql_comments: true
-    open-in-view: false
+  profiles:
+    active: ${ENV:dev} # Set active profile via ENV variable, default to 'dev'
 
   # Jackson Configuration
   jackson:
@@ -47,7 +29,7 @@ spring:
 # Application Configuration
 app:
   jwt:
-    secret: ${JWT_SECRET:mySecretKey1234567890123456789012345678901234567890}
+    secret: ${JWT_SECRET:3310fd8ea8ab8dad6d7021dbde8e11c8228ba4ee2de8553ae9803415c04e5bf1}
     expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
 
   api:

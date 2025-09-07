@@ -48,7 +48,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // Public endpoints
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
+                        // Actuator endpoints
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/actuator/metrics").hasRole("ADMIN")// we can set role as .hasRole("ADMIN") for metrics if needed
 
                         // Swagger/OpenAPI endpoints
                         .requestMatchers("/v3/api-docs/**").permitAll()
@@ -56,9 +58,6 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
-
-                        // H2 Console (for development)
-                        .requestMatchers("/h2-console/**").permitAll()
 
                         // Contact endpoints - require authentication
                         .requestMatchers(HttpMethod.GET, "/api/v1/contacts/**").authenticated()

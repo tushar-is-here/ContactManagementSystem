@@ -22,7 +22,6 @@ A comprehensive REST API for managing contacts with user authentication and auth
 - **Spring Security 6** - JWT authentication and authorization
 - **Spring Data JPA** - Data persistence with Hibernate
 - **PostgreSQL** - Production database
-- **H2 Database** - In-memory database for development and testing
 - **Maven** - Dependency management and build tool
 - **Docker** - Containerization
 - **Swagger/OpenAPI 3** - API documentation
@@ -65,7 +64,6 @@ docker-compose logs -f contact-api
 - **API Base URL**: http://localhost:8080
 - **Swagger UI**: http://localhost:8080/swagger-ui.html
 - **API Docs**: http://localhost:8080/v3/api-docs
-- **H2 Console**: http://localhost:8080/h2-console (development only)
 - **Health Check**: http://localhost:8080/actuator/health
 
 ## 📖 API Documentation
@@ -78,9 +76,9 @@ POST /api/v1/auth/register
 Content-Type: application/json
 
 {
-  "username": "johndoe",
+  "username": "tushar_is_here",
   "password": "securePassword123",
-  "email": "john.doe@example.com"
+  "email": "tpanchal484@gmail.com"
 }
 ```
 
@@ -90,7 +88,7 @@ POST /api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "johndoe",
+  "username": "tushar_is_here",
   "password": "securePassword123"
 }
 ```
@@ -110,9 +108,9 @@ Authorization: Bearer <jwt-token>
 Content-Type: application/json
 
 {
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "john.doe@example.com",
+  "firstName": "Tushar",
+  "lastName": "Panchal",
+  "email": "tpanchal484@gmail.com",
   "phoneNumber": "+1234567890"
 }
 ```
@@ -151,7 +149,7 @@ Authorization: Bearer <jwt-token>
 
 #### Search Contacts
 ```http
-GET /api/v1/contacts/search?firstName=John&lastName=Doe&email=example.com&page=0&size=10
+GET /api/v1/contacts/search?firstName=Tushar&lastName=Panchal&email=gmail.com&page=0&size=10
 Authorization: Bearer <jwt-token>
 ```
 
@@ -167,7 +165,7 @@ Authorization: Bearer <jwt-token>
 
 The application supports multiple profiles:
 
-- **default**: Uses H2 in-memory database
+- **default**: Uses Postgres local DB
 - **production**: Uses PostgreSQL database
 - **test**: Uses H2 for testing
 
@@ -186,12 +184,12 @@ SPRING_PROFILES_ACTIVE=production
 
 ### Database Configuration
 
-#### H2 (Development)
+#### Postgres (Development)
 ```yaml
 spring:
   datasource:
     url: jdbc:h2:mem:contactdb
-    driver-class-name: org.h2.Driver
+    driver-class-name: org.postgressql.Driver
     username: sa
     password: password
 ```
@@ -404,16 +402,16 @@ curl -X POST http://localhost:8080/api/v1/contacts \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{
-    "firstName": "John",
-    "lastName": "Doe",
-    "email": "john.doe@example.com",
+    "firstName": "Tushar",
+    "lastName": "Panchal",
+    "email": "tpanchal484@gmail.com",
     "phoneNumber": "+1234567890"
   }'
 ```
 
 #### 4. Search contacts
 ```bash
-curl -X GET "http://localhost:8080/api/v1/contacts/search?firstName=John&page=0&size=10" \
+curl -X GET "http://localhost:8080/api/v1/contacts/search?firstName=Tushar&page=0&size=10" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
