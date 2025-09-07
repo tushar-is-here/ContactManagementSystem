@@ -35,7 +35,7 @@ USER appuser
 EXPOSE 8080
 
 # Environment variables
-ENV SPRING_PROFILES_ACTIVE=production
+ENV SPRING_PROFILES_ACTIVE=prod
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
 # Health check (optional)
