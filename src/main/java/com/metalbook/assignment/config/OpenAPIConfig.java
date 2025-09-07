@@ -83,8 +83,8 @@ public class OpenAPIConfig {
                     """)
                         .contact(new Contact()
                                 .name("Contact Management Team")
-                                .email("support@contactmanagement.com")
-                                .url("https://github.com/your-org/contact-management-api"))
+                                .email("tpanchal484@gmail.com")
+                                .url("git@github.com:tushar-is-here/ContactManagementSystem.git"))
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
@@ -93,7 +93,7 @@ public class OpenAPIConfig {
                                 .url("http://localhost:" + serverPort)
                                 .description("Development Server"),
                         new Server()
-                                .url("https://your-app.herokuapp.com")
+                                .url("https://contactManagementSystem.com")
                                 .description("Production Server")
                 ));
     }

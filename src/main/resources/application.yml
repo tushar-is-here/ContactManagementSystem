@@ -57,7 +57,7 @@ app:
     contact:
       name: "Development Team"
       email: "dev@contactmanagement.com"
-      url: "https://github.com/your-org/contact-management-api"
+      url: "git@github.com:tushar-is-here/ContactManagementSystem.git"
 
 # Logging Configuration
 logging:

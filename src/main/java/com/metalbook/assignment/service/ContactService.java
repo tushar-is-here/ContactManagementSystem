@@ -38,13 +38,20 @@ public class ContactService {
             throw new DuplicateResourceException("Contact with email '" + request.email() + "' already exists");
         }
 
-        Contact contact = new Contact(
-                request.firstName(),
-                request.lastName(),
-                request.email(),
-                request.phoneNumber(),
-                userId
-        );
+//        Contact contact = new Contact(
+//                request.firstName(),
+//                request.lastName(),
+//                request.email(),
+//                request.phoneNumber(),
+//                userId
+//        );
+        Contact contact = Contact.builder()
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .email(request.email())
+                .phoneNumber(request.phoneNumber())
+                .userId(userId)
+                .build();
 
         Contact savedContact = contactRepository.save(contact);
         return mapToContactResponse(savedContact);

@@ -52,11 +52,16 @@ public class AuthService {
         }
 
         // Create new user
-        User user = new User(
-                request.username(),
-                passwordEncoder.encode(request.password()),
-                request.email()
-        );
+//        User user = new User(
+//                request.username(),
+//                passwordEncoder.encode(request.password()),
+//                request.email()
+//        );
+        User user = User.builder()
+                .username(request.username())
+                .password(passwordEncoder.encode(request.password()))
+                .email(request.email())
+                .build();
 
         User savedUser = userRepository.save(user);
         return mapToUserInfo(savedUser);

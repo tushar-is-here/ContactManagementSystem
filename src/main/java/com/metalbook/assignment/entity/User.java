@@ -1,7 +1,9 @@
 package com.metalbook.assignment.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,6 +14,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@ToString(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -22,6 +30,7 @@ public class User implements UserDetails {
 
     @NotBlank
     @Column(unique = true, nullable = false, length = 50)
+    @ToString.Include
     private String username;
 
     @NotBlank
@@ -30,10 +39,15 @@ public class User implements UserDetails {
 
     @NotBlank
     @Column(nullable = false, length = 100)
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    @ToString.Include
     private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @ToString.Include
+    @Builder.Default
     private Role role = Role.USER;
 
     @CreationTimestamp
@@ -41,18 +55,8 @@ public class User implements UserDetails {
     private LocalDateTime createdAt;
 
     @Column(name = "is_enabled")
+    @Builder.Default
     private boolean enabled = true;
-
-    // Constructors
-    public User() {}
-
-    public User(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.role = Role.USER;
-        this.enabled = true;
-    }
 
     // UserDetails implementation
     @Override
@@ -90,51 +94,6 @@ public class User implements UserDetails {
         return enabled;
     }
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -146,18 +105,6 @@ public class User implements UserDetails {
     @Override
     public int hashCode() {
         return Objects.hash(id, username);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", role=" + role +
-                ", createdAt=" + createdAt +
-                ", enabled=" + enabled +
-                '}';
     }
 
     public enum Role {
