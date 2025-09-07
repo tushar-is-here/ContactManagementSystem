@@ -3,11 +3,13 @@ package com.metalbook.assignment;
 import com.metalbook.assignment.dto.ContactRequest;
 import com.metalbook.assignment.dto.LoginRequest;
 import com.metalbook.assignment.dto.UserRegistrationRequest;
+import com.metalbook.assignment.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,6 +30,9 @@ class AssignmentApplicationTests {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
 	@Test
 	void contextLoads() {

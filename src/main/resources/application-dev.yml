@@ -1,4 +1,4 @@
-# Production Profile
+# Development Profile
 spring:
   config:
     activate:
