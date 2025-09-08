@@ -188,7 +188,7 @@ SPRING_PROFILES_ACTIVE=production
 ```yaml
 spring:
   datasource:
-    url: jdbc:h2:mem:contactdb
+    url: jdbc:postgresql://localhost:5432/metalbook
     driver-class-name: org.postgressql.Driver
     username: sa
     password: password
@@ -237,36 +237,49 @@ docker build -t contact-management-api .
 
 ### Deploy to Heroku
 
-1. **Create Heroku App**
+1. **Create Railway App**
    ```bash
-   heroku create your-app-name
+   Create new app on Railway and connect GitHub repository with it.
    ```
 
 2. **Add PostgreSQL Addon**
    ```bash
-   heroku addons:create heroku-postgresql:mini
+   jdbc:postgresql://switchyard.proxy.rlwy.net:31370/railway
    ```
 
 3. **Set Environment Variables**
    ```bash
-   heroku config:set JWT_SECRET=your-secret-key
-   heroku config:set SPRING_PROFILES_ACTIVE=production
+   ENV: prod
    ```
 
 4. **Deploy**
    ```bash
-   git push heroku main
+   Set up automatic deploys from the main branch or deploy manually with CI/CD.
    ```
 
 ### Deploy with Docker
 
 ```bash
 # Build and run
-docker build -t contact-api .
-docker run -p 8080:8080 contact-api
+docker build -t contact-management-system .
+docker run -d -p 8080:8080 --name cms-container contact-management-system
 
 # Or use docker-compose
 docker-compose up -d
+
+# Check if the container is running
+docker ps
+
+# Access your application
+http://localhost:8080/swagger-ui.html
+
+# View logs
+docker logs -f cms-container
+
+# Stop and remove container
+docker stop cms-container
+docker rm cms-container
+docker rmi contact-management-system
 ```
 
 ## 📁 Project Structure
@@ -482,7 +495,7 @@ curl http://localhost:8080/actuator/health
 
 #### 1. Database Connection Issues
 ```bash
-# Check if PostgreSQL is running
+# Check if PostgreSQL is running when deployed with Docker
 docker-compose ps postgres
 
 # View database logs
@@ -528,8 +541,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Contact Management Team**
-- Email: dev@contactmanagement.com
-- GitHub: [@your-github-username](https://github.com/your-github-username)
+- Email: tpanchal484@gmail.com
+- GitHub: [@tushar-is-here](https://github.com/tushar-is-here)
 
 ---
 
